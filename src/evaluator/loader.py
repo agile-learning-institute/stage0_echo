@@ -1,4 +1,5 @@
 import os
+import csv
 from echo.message import Message
 
 import logging
@@ -6,37 +7,42 @@ logger = logging.getLogger(__name__)
 
 class Loader:
     """
-    Load input data
+    Load methods that read csv files and return a list of message dictionaries with role and content properties. 
     """
     def __init__(self, input_folder=None):
-        """ """
+        """Initialize Loader
+        
+        Args: input_folder were data files will be located
+        """
         self.input_folder = input_folder
 
     def load_messages(self, files=None):
-        # Return a list of messages loaded from csv files with role, content columns
+        """"Get messages from a list of simple {role, content} csv files from the input_folder/grader folder"""
         messages = []
         for file in files:
-            lines = [] # parse csv file from self.input_folder/grader/{file} into list of dict using column names
-            messages.extend(lines)
+            file_path = os.path.join(self.input_folder, "grader", file)
+            with open(file_path, mode="r", encoding="utf-8", newline="") as f:
+                reader = csv.DictReader(f, quotechar='"', skipinitialspace=True)
+                messages.extend(reader)                
         return messages
     
-    def load_formatted_messages(self, folder="prompts", files=[]):
-        # Return a list of messages loaded from the csv files with role, from, to, text columns
+    def load_formatted_messages(self, folder="prompts", files=None):
+        """"Construct messages from a list of {role, from, to, text} csv files found in the specified folder"""
         messages = []
         for file in files:
-            lines = [] # parse csv file from self.input_folder/{folder}/{file} into list of dicts with column names
-            for line in lines:
-                messages.append(Message(
-                    role=line["role"], 
-                    user=line["from"], 
-                    dialog=line["to"], 
-                    text=line["text"]
-                ).as_llm_message())
+            file_path = os.path.join(self.input_folder, folder, file)
+            with open(file_path, mode="r", encoding="utf-8", newline="") as f:
+                reader = csv.DictReader(f, quotechar='"', skipinitialspace=True)
+                lines = list(reader) 
+
+            messages.extend(Message(
+                role=line["role"],
+                user=line["from"],
+                dialog=line["to"],
+                text=line["text"]
+            ).as_llm_message() for line in lines)
         return messages
     
     def load_formatted_conversations(self, folder="conversations", files=None):
-        conversations = {}
-        for file in files:
-            conversations[file] = self.load_formatted_messages(folder=folder, files=[file])
-        return conversations
-    
+        """"Construct a dictionary of filename: [messages] from a list of formatted csv file names found in the conversations"""
+        return {file: self.load_formatted_messages(folder=folder, files=[file]) for file in files or []}
