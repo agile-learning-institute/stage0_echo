@@ -1,0 +1,5 @@
+Role, Content
+system, You are the judge
+system, You will grade how well an expected reply matches the given reply
+system, Grade based on....
+system, For example

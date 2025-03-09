@@ -1,0 +1,22 @@
+- name: FranBasic_Test_Suite_1
+  model: lama3.2:latest
+  grade_by: 
+  - grad_master_1
+  prompts: 
+  - Fran_basic.1.0.0.csv
+  - Echo.1.0.0.csv
+  - Fran.1.0.0.csv
+  conversations:
+  - "test1.csv"
+  - "test2.csv"
+- name: FranBasic_Test_Suite_2
+  model: deepseek3.2:latest
+  grade_by: 
+  - grad_master_1
+  prompts: 
+  - Fran_basic.1.0.0.csv
+  - Echo.1.0.0.csv
+  - Fran.1.0.0.csv
+  conversations:
+  - "test1.csv"
+  - "test2.csv"  
