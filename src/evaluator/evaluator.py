@@ -48,7 +48,7 @@ class Evaluator:
             elif message["role"] == "assistant":
                 given=reply["content"]
                 expected=message["content"]
-                grades.append([latency, self.grade_reply(given, expected)])
+                grades.append({"expected":expected, "given":given, "latency":latency, "grade":self.grade_reply(given, expected)})
         return grades
         
     def grade_reply(self, expected=None, given=None):
