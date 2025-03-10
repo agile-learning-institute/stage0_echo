@@ -21,6 +21,7 @@ class Loader:
         messages = []
         for file in files:
             file_path = os.path.join(self.input_folder, "grader", file)
+            logger.debug(f"Loading Messages from {file_path}")
             with open(file_path, mode="r", encoding="utf-8", newline="") as f:
                 reader = csv.DictReader(f, quotechar='"', skipinitialspace=True)
                 messages.extend(reader)                
@@ -31,6 +32,7 @@ class Loader:
         messages = []
         for file in files:
             file_path = os.path.join(self.input_folder, folder, file)
+            logger.debug(f"Loading Formatted Messages from {file_path}")
             with open(file_path, mode="r", encoding="utf-8", newline="") as f:
                 reader = csv.DictReader(f, quotechar='"', skipinitialspace=True)
                 lines = list(reader) 

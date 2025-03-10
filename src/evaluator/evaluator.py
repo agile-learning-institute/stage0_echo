@@ -1,4 +1,6 @@
 import os
+
+import ollama
 # from ollama import ollama
 from echo.message import Message
 
@@ -16,14 +18,16 @@ class Evaluator:
     prompts: Array of {role:, content:} messages used at the beginning of a conversation
     conversations: A dictionary of filename.csv entries, with Array of {role:, content:} messages to be evaluated
     """
-    def __init__(self, name=None, model=None, grade_prompt=None, prompts=None, conversations=None):
+    def __init__(self, name=None, model=None, grade_prompt_files=None, grade_prompt=None, prompt_files=None, prompt=None, conversations=None):
         """ """
         self.input_folder = input
         self.name = name
         self.model = model
-        self.grade_prompt = grade_prompt    # Grading Prompt [message]
-        self.prompts = prompts              # Conversation engineered prompt [message]
-        self.conversations = conversations  # Conversations for testing, dict of filename: [message]
+        self.grade_prompt_files = grade_prompt_files
+        self.grade_prompt = grade_prompt    
+        self.prompt_files = prompt_files
+        self.prompt = prompt
+        self.conversations = conversations  
         logger.info(f"Evaluator Initialized {self.name}")
 
     def evaluate(self):
@@ -31,40 +35,54 @@ class Evaluator:
         grades = {
             "model": self.model,
             "prompts": self.prompt_files,
-            "grader": self.grader_prompts
+            "grader": self.grade_prompt_files
         }
-        for name, conversation in self.conversations:
+        for name, conversation in self.conversations.items():
             grades[name] = self.grade_conversation(conversation)
             logger.info(f"Graded {name} as {grades[name]}")
         return grades
 
     def grade_conversation(self, conversation=[]):
-        messages = self.prompts
+        messages = self.prompt[:]
         grades = []
         for message in conversation:
             messages.append(message)
             if message["role"] == "user":
                 reply, latency = self.chat(messages=messages)
             elif message["role"] == "assistant":
-                given=reply["content"]
                 expected=message["content"]
-                grades.append({"expected":expected, "given":given, "latency":latency, "grade":self.grade_reply(given, expected)})
+                given=reply["content"]
+                grade = self.grade_reply(expected=expected, given=given)
+                grades.append({
+                    "expected":expected, 
+                    "given":given, 
+                    "latency":latency, 
+                    "grade":grade
+                })
         return grades
         
     def grade_reply(self, expected=None, given=None):
         # Use LLM model with grading prompts to grade message
         messages = self.grade_prompt[:]
-        messages.append({"role":"user", "content": f"Grade the given value\n{given}\nAgainst the expected value\n{expected}"})
-        grade, latency = self.chat(messages)["content"]
-        # If grade not a good grade then log a error and return None
+        messages.append({"role":"user", "content": f"Given:\n{given}\nExpected:\n{expected}"})
+        reply, latency = self.chat(messages)
+        try:
+            grade = float(reply["content"])
+        except Exception:
+            logger.warning(f"Grader didn't return a valid float: {reply["content"]}")
+            grade = None
         return grade
     
     def chat(self, messages=None):
         # Get chat response to messages
         # return ollama.chat(model=self.model, messages=messages)
         # reply = ollama.chat(model=self.model, messages=messages)
-        reply = {}
-        latency = reply["latency"]
-        response = reply["content"]
+        reply = ollama.chat(model=self.model, messages=messages)
+        logger.info(f"Chat reply {reply}")
+        latency = reply.total_duration
+        response = {
+            "role":reply.message.role, 
+            "content":reply.message.content
+        }
         return response, latency
         

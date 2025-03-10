@@ -21,8 +21,10 @@ class Runbook:
             evaluator = Evaluator(
                 name=config["name"], 
                 model=config["model"], 
+                grade_prompt_files=config["grade_prompt"],
                 grade_prompt=loader.load_messages(files=config["grade_prompt"]), 
-                prompts=loader.load_formatted_messages(files=config["prompts"]), 
+                prompt_files=config["prompts"],
+                prompt=loader.load_formatted_messages(files=config["prompts"]), 
                 conversations=loader.load_formatted_conversations(files=config["conversations"])
             )
 
