@@ -12,12 +12,12 @@ the model's responses to each assistant reply in a test conversation. Grades are
 that specializes in comparing given and expected values. 
 
 ## Using this in your project. 
-Adjust this command to use appropriate values for the input and output volumes in your project. Your input folder should contain ``conversations``, ``grader``, and ``prompts`` folders with the csv files with your grader, prompts, and testing conversations. Your config folder should contain a ``configurations.yaml`` file. There is a [sample file](./test/configuration/configuration.yaml) in the test/configuration folder. A single output file called ``grades.json`` will be written to the output folder.
+Adjust this command to use appropriate values for your Echo Bot project. Your input folder should contain ``conversations``, ``grader``, and ``prompts`` folders with the csv files with your grader, prompts, and testing conversations. Your config folder should contain a ``configurations.yaml`` file. There is a [sample file](./test/configuration/configuration.yaml) in the test/configuration folder. A single output file called ``grades.json`` will be written to the output folder. Any existing ``grades.json`` file will be over-written.
 ```bash
 docker run --rm /
-    -v ~/config:/opt/config
-    -v ~/input:/opt/input
-    -v ~/output:/opt/output
+    -v ./bot_name:/opt/input
+    -v ./bot_name/config:/opt/config
+    -v ./bot_name/output:/opt/output
     ghcr.io/agile-learning-institute/stage0-echo-evaluate:latest
 ```
 
@@ -48,17 +48,22 @@ pipenv install
 pipenv run clean
 ```
 
-### Run code locally.
+### Run Evaluate Runbook locally.
 ```bash
 pipenv run local
 ```
 Note: This does clean then runs the code locally
 
-### Debug code locally.
+### Run Grader Runbook locally.
+```bash
+pipenv run grader
+```
+
+### Debug Evaluate Runbook locally
 ```bash
 pipenv run debug
 ```
-Note: This does clean then runs the code locally with logging set to DEBUG
+Runs locally with logging level set to DEBUG
 
 ### Build the Evaluate Runbook container
 ```bash
