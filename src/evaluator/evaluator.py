@@ -10,14 +10,26 @@ logger = logging.getLogger(__name__)
 
 class Evaluator:
     """
-    Evaluate a Replies to a set of conversations
+    Evaluate the LLM replies to a set of test conversations. 
+    Each conversation is built up one message at a time, and at each "assistant" message 
+    a LLM reply is created and compared against the message from the test conversation. 
     
-    parameters
+    Grading a response against an expected value is done by a separate grading LLM, with an 
+    engineered prompt that compares an expected value with a given value and grades how
+    "alike" they are as a number between 0 and 1. 
+    
+    Parameters
     name: Configuration name
-    model: LLM Model Name
-    grade_prompt: Array of {role:, content:} messages used as the prompt for grading a reply
-    prompts: Array of {role:, content:} messages used at the beginning of a conversation
-    conversations: A dictionary of filename.csv entries, with Array of {role:, content:} messages to be evaluated
+    model: LLM Model Name for evaluation
+    grade_model: LLM Model for grading responses
+    grade_prompt_files: A list of csv file names found in the input_folder/grader folder
+    grade_prompt: Array of LLM messages used as the prompt for grading a reply. 
+            These can be loaded with a Evaluator.loader.load_messages(grade_prompt_files).
+    prompt_files: A list of csv file names in the input_folder/prompts folder. 
+    prompts: Array of LLM messages used as an engineered prompt at the beginning of each test conversation. 
+            These can be loaded with an Evaluator.loader.load_formatted_messages(prompt_files)
+    conversations: A dictionary of filename.csv entries, with Array of LLM messages to be evaluated.
+            These can be loaded with Evaluator.loader.load_formatted_conversations(test_conversation_files)
     """
     def __init__(self, name=None, model=None, grade_model=None, grade_prompt_files=None, grade_prompt=None, prompt_files=None, prompt=None, conversations=None):
         """ """
@@ -80,9 +92,9 @@ class Evaluator:
         return grade
     
     def chat(self, model=None, messages=None):
-        # Get chat response to messages
-        # return ollama.chat(model=self.model, messages=messages)
-        # reply = ollama.chat(model=self.model, messages=messages)
+        # Get chat response to conversation
+        # use ollama.chat(model=self.model, messages=messages)
+        # return a LLM Message dict (role, content)
         model = model or self.model
         reply = ollama.chat(model=self.model, messages=messages)
         logger.debug(f"Chat reply {reply.message.content}")

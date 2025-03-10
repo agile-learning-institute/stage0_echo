@@ -1,4 +1,4 @@
-FROM deepseek-r1:32b
+FROM deepseek-r1:70b
 
 # Set the temperature for maximum and coherence
 PARAMETER temperature 0

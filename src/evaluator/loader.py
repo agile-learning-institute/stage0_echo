@@ -7,11 +7,10 @@ logger = logging.getLogger(__name__)
 
 class Loader:
     """
-    Load methods that read csv files and return a list of message dictionaries with role and content properties. 
+    Tools that read csv files and return a list of LLM message dictionaries (role, content)
     """
     def __init__(self, input_folder=None):
-        """Initialize Loader
-        
+        """
         Args: input_folder were data files will be located
         """
         self.input_folder = input_folder
@@ -28,7 +27,11 @@ class Loader:
         return messages
     
     def load_formatted_messages(self, folder="prompts", files=None):
-        """"Construct messages from a list of {role, from, to, text} csv files found in the specified folder"""
+        """"
+        Construct messages from a list of {role, from, to, text} csv files found in the specified folder
+        The input folder defaults to self.input_folder/prompts, but can be overridden when loading
+        formatted messages from self.input_folder/conversations. 
+        """
         messages = []
         for file in files:
             file_path = os.path.join(self.input_folder, folder, file)
@@ -46,5 +49,8 @@ class Loader:
         return messages
     
     def load_formatted_conversations(self, folder="conversations", files=None):
-        """"Construct a dictionary of filename: [messages] from a list of formatted csv file names found in the conversations"""
+        """"
+        Construct a dictionary of filename: [messages] 
+        from a list of csv file names, that are found in the self.input_folder/conversations
+        """
         return {file: self.load_formatted_messages(folder=folder, files=[file]) for file in files or []}
