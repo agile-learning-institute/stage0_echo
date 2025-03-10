@@ -2,6 +2,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Message:
+    """_summary_
+    A LLM message object (role, content) with From and To values to support group conversations
+    
+    A message can be constructed from a LLM Message, or from a formatted content string, or from 
+    the four independent values (role, from, to, text). 
+
+    Typical use will construct a message from some source, and use the as_llm_message() or as_dict() methods
+    to render the message in a needed format. 
+    """
     USER_ROLE = "user"
     ASSISTANT_ROLE = "assistant"
     SYSTEM_ROLE = "system"
@@ -12,13 +21,14 @@ class Message:
     VALID_DIALOGS = [GROUP_DIALOG, TOOLS_DIALOG, INTERNAL_DIALOG]
     
     def __init__(self, 
-                 llm_message=None, ## Dict with role and content properties
-                 encoded_text=None, ## String with From: To: structure
+                 llm_message=None,  ## dict with role and content properties
+                 encoded_text=None, ## string with From: To: structure
                  user="unknown", text="", 
                  role=USER_ROLE, dialog=GROUP_DIALOG):
         """
-        Initialize a message, from a llm dict, 
-        or encoded_text, or individual parameters.
+        Initialize a message, using defaults first, individual parameters if provided.
+        If a llm_message is provided it can over-ride those values. 
+        If an encoded_text value is provided it can also over-ride previously established values.
         """
         self.user = user
         self.role = role
