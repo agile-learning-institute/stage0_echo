@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class Runbook:
     """
-    Processor class for testing a grading prompt
+    Processor class for testing a grading prompt using a grading key
     """
     def __init__(self, grade_prompts=None, grade_keys=None, input_folder="./input"):
         self.loader = Loader(input_folder=input_folder)
@@ -48,11 +48,9 @@ def main():
     input_folder = os.getenv("INPUT_FOLDER", "./test/configuration")
     logging_level = os.getenv("LOG_LEVEL", "INFO")
 
-    if len(sys.argv) < 3:
-        print("Usage: grader_test.py '[\"grade_prompt1.csv\", \"grade_prompt2.csv\"]' '[\"grade_key1.csv\", \"grade_key2.csv\"]'")
-        sys.exit(1)
-    grade_prompts = json.loads(sys.argv[1])
-    grade_keys = json.loads(sys.argv[2])
+    # Get Grading Prompt Files and Key Files
+    grade_prompts = json.loads(sys.argv[1]) or ["basic_grader.csv"] or sys.exit(1)
+    grade_keys = json.loads(sys.argv[2]) or ["basic_grader_key.csv"] or sys.exit(1)
     
     logging.basicConfig(level=logging_level)
     logger.info(f"======================== Grader Evaluation Pipeline Starting ============================")

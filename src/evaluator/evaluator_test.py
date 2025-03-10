@@ -82,7 +82,7 @@ class TestEvaluator(unittest.TestCase):
 
         # Assert        
         self.assertEqual(grade, 0.85)
-        mock_chat.assert_called_with(messages)
+        mock_chat.assert_called_with(model=None, messages=messages)
 
     @patch.object(Evaluator, 'chat')
     def test_grade_reply_invalid_float(self, mock_chat):

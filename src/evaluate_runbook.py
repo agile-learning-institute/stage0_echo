@@ -4,7 +4,7 @@ from evaluator.loader import Loader
 
 class Runbook:
     """
-    Processor class for evaluating a Echo LLM Configuration
+    Processor class for evaluating a Echo LLM Configuration (Models and Prompts)
     """
     def __init__(self, config_folder="./config", input_folder="./input", output_folder="./output"):
         self.config_folder = config_folder
