@@ -18,11 +18,12 @@ class Evaluator:
     prompts: Array of {role:, content:} messages used at the beginning of a conversation
     conversations: A dictionary of filename.csv entries, with Array of {role:, content:} messages to be evaluated
     """
-    def __init__(self, name=None, model=None, grade_prompt_files=None, grade_prompt=None, prompt_files=None, prompt=None, conversations=None):
+    def __init__(self, name=None, model=None, grade_model=None, grade_prompt_files=None, grade_prompt=None, prompt_files=None, prompt=None, conversations=None):
         """ """
         self.input_folder = input
         self.name = name
         self.model = model
+        self.grade_model = grade_model
         self.grade_prompt_files = grade_prompt_files
         self.grade_prompt = grade_prompt    
         self.prompt_files = prompt_files
@@ -65,7 +66,7 @@ class Evaluator:
         # Use LLM model with grading prompts to grade message
         messages = self.grade_prompt[:]
         messages.append({"role":"user", "content": f"Given:\n{given}\nExpected:\n{expected}"})
-        reply, latency = self.chat(messages)
+        reply, latency = self.chat(model=self.grade_model, messages=messages)
         try:
             grade = float(reply["content"])
         except Exception:
@@ -73,12 +74,13 @@ class Evaluator:
             grade = None
         return grade
     
-    def chat(self, messages=None):
+    def chat(self, model=None, messages=None):
         # Get chat response to messages
         # return ollama.chat(model=self.model, messages=messages)
         # reply = ollama.chat(model=self.model, messages=messages)
+        model = model or self.model
         reply = ollama.chat(model=self.model, messages=messages)
-        logger.info(f"Chat reply {reply}")
+        logger.debug(f"Chat reply {reply}")
         latency = reply.total_duration
         response = {
             "role":reply.message.role, 

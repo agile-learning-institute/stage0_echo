@@ -1,5 +1,6 @@
 - name: Test_Suite1_lama
   model: lama3.2:latest
+  grade_model: Gary:latest
   grade_by: 
   - test_grader_1.csv
   - test_grader_2.csv

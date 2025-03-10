@@ -21,6 +21,7 @@ class Runbook:
             evaluator = Evaluator(
                 name=config["name"], 
                 model=config["model"], 
+                grade_model=config["grade_model"],
                 grade_prompt_files=config["grade_prompt"],
                 grade_prompt=loader.load_messages(files=config["grade_prompt"]), 
                 prompt_files=config["prompts"],
