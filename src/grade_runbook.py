@@ -15,6 +15,7 @@ class Runbook:
         self.loader = Loader(input_folder=input_folder)
         self.evaluator = Evaluator(
             name="Grade Prompt Evaluator", 
+            model="llama3.2:latest",
             grade_model="Gary:latest",
             grade_prompt=self.loader.load_messages(files=grade_prompts)
         )
@@ -27,8 +28,8 @@ class Runbook:
         for line in self.grade_keys:
             given = line["given"]
             expected = line["expected"]
-            min_value = line["min_value"]
-            max_value = line["max_value"]
+            min_value = float(line["min_value"])
+            max_value = float(line["max_value"])
             grade = self.evaluator.grade_reply(expected=expected, given=given)
             outcomes.append({
                 "Given": given, 
@@ -45,14 +46,17 @@ class Runbook:
         print(f"Grade: {passing / len(outcomes)}")
     
 def main():
-    input_folder = os.getenv("INPUT_FOLDER", "./test/configuration")
+    input_folder = os.getenv("INPUT_FOLDER", "./test/")
     logging_level = os.getenv("LOG_LEVEL", "INFO")
 
     # Get Grading Prompt Files and Key Files
-    grade_prompts = json.loads(sys.argv[1]) or ["basic_grader.csv"] or sys.exit(1)
-    grade_keys = json.loads(sys.argv[2]) or ["basic_grader_key.csv"] or sys.exit(1)
+    grade_prompts = ["basic_grader.csv"]
+    grade_keys = ["basic_grader_key.csv"]
+    # if len(sys.argv) < 3: print usage, sys.exit(1)
+    # grade_prompts = json.loads(sys.argv[1]) 
+    # grade_keys = json.loads(sys.argv[2]) 
     
-    logging.basicConfig(level=logging_level)
+    logging.basicConfig(level="DEBUG")
     logger.info(f"======================== Grader Evaluation Pipeline Starting ============================")
     logger.info(f"Initialized, Input: {input_folder}, Logging @{logging_level}")
     logger.info(f"Processing using grader prompts: {grade_prompts}")

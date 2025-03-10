@@ -1,4 +1,4 @@
-FROM llama3.2
+FROM deepseek-r1:32b
 
 # Set the temperature for maximum and coherence
 PARAMETER temperature 0

@@ -10,7 +10,7 @@ class Runbook:
         self.config_folder = config_folder
         self.input_folder = input_folder
         self.output_folder = output_folder
-        self.configs = []            # load config_folder/{configuration.yaml}
+        self.configs = []            # load config_folder/configuration.yaml
     
     def run(self):
         """Process Evaluation Configuration"""
@@ -38,18 +38,19 @@ class Runbook:
         pass
     
 def main():
-    input_folder = os.getenv("INPUT_FOLDER", "./test/configuration")
+    input_folder = os.getenv("INPUT_FOLDER", "./test")
     output_folder = os.getenv("OUTPUT_FOLDER", "./test/output")
+    config_folder = os.getenv("CONFIG_FOLDER", "./test/configuration")
     logging_level = os.getenv("LOG_LEVEL", "INFO")
 
     import logging
     logging.basicConfig(level=logging_level)
     logger = logging.getLogger(__name__)
     logger.info(f"============================ Evaluation Pipeline Starting ==============================")
-    logger.info(f"Initialized, Input Folder: {input_folder}, Output Folder: {output_folder}, Logging Level {logging_level}")
+    logger.info(f"Initialized, Input: {input_folder}, Output: {output_folder}, Config: {config_folder} Logging Level {logging_level}")
     
     try:
-        runner = Runbook(input_folder, output_folder)
+        runner = Runbook(config_folder=config_folder, input_folder=input_folder, output_folder=output_folder)
         runner.run()
     except Exception as e:
         logger.error(f"Error Reported {str(e)}")

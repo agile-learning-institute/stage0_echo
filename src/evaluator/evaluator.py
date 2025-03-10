@@ -1,4 +1,5 @@
 import os
+import re
 
 import ollama
 # from ollama import ollama
@@ -29,7 +30,7 @@ class Evaluator:
         self.prompt_files = prompt_files
         self.prompt = prompt
         self.conversations = conversations  
-        logger.info(f"Evaluator Initialized {self.name}")
+        logger.info(f"Evaluator {self.name} Initialized as {self}")
 
     def evaluate(self):
         """Evaluate the conversations and report the grades"""
@@ -67,10 +68,14 @@ class Evaluator:
         messages = self.grade_prompt[:]
         messages.append({"role":"user", "content": f"Given:\n{given}\nExpected:\n{expected}"})
         reply, latency = self.chat(model=self.grade_model, messages=messages)
+        content = reply["content"]
+        grade = None
         try:
-            grade = float(reply["content"])
+            match = re.search(r"the grade is (\d+(\.\d+)?)", content, re.IGNORECASE)
+            if match:
+                grade = float(match.group(1)) 
         except Exception:
-            logger.warning(f"Grader didn't return a valid float: {reply["content"]}")
+            logger.warning(f"Grader didn't return a valid float: {content}")
             grade = None
         return grade
     
@@ -80,7 +85,7 @@ class Evaluator:
         # reply = ollama.chat(model=self.model, messages=messages)
         model = model or self.model
         reply = ollama.chat(model=self.model, messages=messages)
-        logger.debug(f"Chat reply {reply}")
+        logger.debug(f"Chat reply {reply.message.content}")
         latency = reply.total_duration
         response = {
             "role":reply.message.role, 
