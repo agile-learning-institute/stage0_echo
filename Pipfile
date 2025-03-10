@@ -16,6 +16,8 @@ pyyaml = "*"
 jinja2 = "*"
 requests = "*"
 ollama = "*"
+werkzeug = "*"
+flask = "*"
 
 [dev-packages]
 
